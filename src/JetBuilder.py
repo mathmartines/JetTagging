@@ -10,20 +10,18 @@ class JetBuilder:
     given in the file.
     """
 
-    def __init__(self, data_frame: pd.DataFrame, particle_type: ParticleType):
-        self._data = data_frame
-        self._jet_type = particle_type
+    def __init__(self):
         self._jet_constituent_type = {1: ParticleType.Parton, 0: ParticleType.ZeroPadded}
 
-    def create_jets(self):
+    def create_jets(self, data_frame: pd.DataFrame, jet_type: ParticleType):
         """Creates a numpy array to store all the jets in the file."""
-        return [self._create_jet(jet_constituents) for _, jet_constituents in self._data.iterrows()]
+        return [self._create_jet(jet_constituents, jet_type) for _, jet_constituents in data_frame.iterrows()]
 
-    def _create_jet(self, jet_constituents: pd.Series) -> Jet:
+    def _create_jet(self, jet_constituents: pd.Series, jet_type: ParticleType) -> Jet:
         """Creates a Jet object"""
         # number of constituents is the size of the series divided by the number of features (4)
         number_of_jets = int(len(jet_constituents) / 4)
-        jet = Jet(particle_type=self._jet_type, n_constituents=number_of_jets)
+        jet = Jet(particle_type=jet_type, n_constituents=number_of_jets)
 
         # Creating the JetConstituents objects and adding them to the jet
         jet_constituents_array = jet_constituents.to_numpy()
