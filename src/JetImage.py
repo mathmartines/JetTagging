@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple
+from typing import Tuple, List
 import numpy as np
 from abc import ABC, abstractmethod
 from src.Particle import Jet
@@ -54,6 +54,9 @@ class JetImage:
         if 0 <= eta_bin < self._n_bins_eta and 0 <= phi_bin < self._n_bins_phi:
             self._jet_image[eta_bin * self._n_bins_phi + phi_bin] += pt_value
 
+    def rescale_matrix_image(self, factor):
+        self._jet_image *= factor
+
     def create_jet_image(self, jet) -> np.ndarray:
         """Creates the jet pt image"""
         # reseting the grid (in case it had been used before)
@@ -84,6 +87,7 @@ class IntensityPtCalculator(ABC):
 
 class JetImageCalculator(IntensityPtCalculator):
     """Evaluates the pT intensity in each pixel of a Jet object"""
+
     def calculate_intensity(self, jet: Jet):
         """Updates the jet image with the jet constituents pT"""
         for jet_constituent in jet:
@@ -91,3 +95,26 @@ class JetImageCalculator(IntensityPtCalculator):
             self._jet_image.update_jet_image(
                 eta_value=jet_momentum.eta, phi_value=jet_momentum.phi, pt_value=jet_momentum.pt
             )
+
+
+class JetImageAvarageCalculator(IntensityPtCalculator):
+    """Calculates the avarage pT intensity in each pixel of a list of Jet objects"""
+
+    def __init__(self, jet_image_calculator: IntensityPtCalculator):
+        # to evaluate the intensity of each jet in the list we
+        self._jet_image_calculator = jet_image_calculator
+        super().__init__()
+
+    def set_jet_image(self, jet_image: JetImage):
+        super().set_jet_image(jet_image)
+        # we also must add the jet image in the object where the pixels are going to be
+        # modified
+        self._jet_image_calculator.set_jet_image(jet_image)
+
+    def calculate_intensity(self, jet: List[Jet]):
+        """Calculates the avarge in intensity for each pixel of a list of Jet objects."""
+        # calculating image for each jet
+        for jet_object in jet:
+            self._jet_image_calculator.calculate_intensity(jet_object)
+        # taking the avarage of each jet
+        self._jet_image.rescale_matrix_image(1. / len(jet))
