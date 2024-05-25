@@ -88,6 +88,12 @@ class Jet(Particle):
         # adding the particle momentum to the total momentum of the jet
         self._momentum += constituent.momentum
 
+    def jet_substructure(self) -> np.array:
+        return np.array([
+            [particle.momentum.pt, particle.momentum.eta, particle.momentum.phi]
+            for particle in self._constituents if particle.particle_type != ParticleType.ZeroPadded
+        ])
+
     def _check_vector_lenght(self):
         """Checks if we need to add more space to the vector."""
         if self._index_pos == len(self._constituents):

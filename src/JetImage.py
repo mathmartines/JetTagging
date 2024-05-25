@@ -3,6 +3,7 @@ from typing import Tuple, List
 import numpy as np
 from abc import ABC, abstractmethod
 from src.Particle import Jet
+import energyflow as ef
 
 
 class JetImage:
