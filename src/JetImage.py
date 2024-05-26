@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import Tuple, List
 import numpy as np
 from abc import ABC, abstractmethod
+import pandas as pd
+
 from src.Particle import Jet
 
 
@@ -94,6 +96,19 @@ class JetImageCalculator(IntensityPtCalculator):
             jet_momentum = jet_constituent.momentum
             self._jet_image.update_jet_image(
                 eta_value=jet_momentum.eta, phi_value=jet_momentum.phi, pt_value=jet_momentum.pt
+            )
+
+
+class JetImageCalculatorPandas(IntensityPtCalculator):
+    """Evaluates the pT intensity in each pixel of a Jet, where a jet is just a line of the pandas data frame."""
+
+    def calculate_intensity(self, jet: pd.Series):
+        """Updates the jet image with the jet constituents pT"""
+        # looping over all the jets
+        for jet_index in range(0, len(jet), 4):
+            eta, phi, pt = jet[jet_index: jet_index + 3]
+            self._jet_image.update_jet_image(
+                eta_value=eta, phi_value=phi, pt_value=pt
             )
 
 
