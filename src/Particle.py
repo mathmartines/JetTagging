@@ -25,6 +25,7 @@ class Particle(ABC):
     def __init__(self, particle_type: ParticleType):
         self._particle_type = particle_type
 
+    @property
     @abstractmethod
     def momentum(self) -> MomentumObject3D:
         """Returns the momentum of the particle"""
@@ -81,12 +82,18 @@ class Jet(Particle):
 
     def add_particle(self, constituent: Particle):
         """Add a particle to the list of particle constituents."""
+        # checking if it's a real particle
         # in case we need more space we need to resize the vector
         self._check_vector_lenght()
         self._constituents[self._index_pos] = constituent
         self._index_pos += 1
         # adding the particle momentum to the total momentum of the jet
-        self._momentum += constituent.momentum
+        self._update_momentum(constituent.momentum)
+
+    def _update_momentum(self, momentum_const: MomentumObject3D):
+        self._momentum.pt += momentum_const.pt
+        self._momentum.phi += momentum_const.phi
+        self._momentum.eta += momentum_const.eta
 
     def jet_substructure(self) -> np.array:
         return np.array([
@@ -107,7 +114,8 @@ class Jet(Particle):
         return self._momentum
 
     def __len__(self):
-        return len(self._constituents)
+        """Returns the number of non-ZeroPadded particles."""
+        return len([particle for particle in self._constituents if particle.particle_type != ParticleType.ZeroPadded])
 
     def __iter__(self):
         return iter(self._constituents)
