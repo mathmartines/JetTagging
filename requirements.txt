@@ -1,5 +1,7 @@
-numpy~=1.24.3
+numpy
 energyflow~=1.3.2
-vector~=1.4.0
-pandas~=2.2.1
+vector
+pandas
 wasserstein~=1.0.1
+scikit-learn
+matplotlib

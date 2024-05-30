@@ -66,7 +66,7 @@ class JetImage:
         # perfoming the calculation of the intensity in each bin
         self._pt_intensity_calculator.calculate_intensity(jet)
         # reshaping the array in a convinient way to the user
-        return np.reshape(self._jet_image, newshape=(self._n_bins_eta, self._n_bins_phi))
+        return np.reshape(np.copy(self._jet_image), newshape=(self._n_bins_eta, self._n_bins_phi))
 
 
 class IntensityPtCalculator(ABC):
