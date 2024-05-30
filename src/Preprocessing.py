@@ -96,7 +96,7 @@ class PreprocessingJetImages(BaseEstimator, TransformerMixin):
         jet_images = np.array([self._jet_image.create_jet_image(jet_features).reshape(-1) for jet_features in X])
         self._labels = create_jet_labels(y)
         # shuffling the data
-        jet_images, self._labels = shuffle(jet_images, self._labels)
+        jet_images, self._labels = shuffle(jet_images, self._labels, random_state=42)
 
         return jet_images
 
