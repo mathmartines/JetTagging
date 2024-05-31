@@ -11,7 +11,7 @@ import numpy as np
 
 if __name__ == "__main__":
     # reading the data we want to save
-    data_file = pd.read_csv('../../Data/g_jets.csv', header=None, sep=' ')
+    data_file = pd.read_csv('../Data/g_jets.csv', header=None, sep=' ')
     # defining the degree of the polynomions
     efp_processing = PreprocessingEFPs(5, create_labels_single_column)
     # processing the data by constructing the polynomials
