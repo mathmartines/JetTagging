@@ -186,7 +186,7 @@ class PreprocessingEFPs(JetProcessing):
 
         :param d: degree of the polynomial.
         """
-        self._efps_set = ef.EFPSet(("d<=", d), *args, measure='hadr', beta=1, normed=True, verbose=True)
+        self._efps_set = ef.EFPSet(("d<=", d), *args, measure='hadr', beta=1, normed=False, verbose=True)
         super().__init__(jet_label_algorithm=jet_label_algorithm)
 
     @property
