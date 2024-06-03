@@ -54,7 +54,7 @@ class BestEFPsFinder:
         # base condition
         # Either we reached the lower accuracy limit we wanted or the feature set has only one feature
         if best_accuracy < accuracy_fraction_limit * self._model_accuracy or len(best_features_set) == 1:
-            return best_features_set
+            return self._best_features_set
 
         # making the recursive call
         self._best_features_set = best_features_set
