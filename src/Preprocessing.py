@@ -107,7 +107,7 @@ class JetProcessing(ABC, BaseEstimator, TransformerMixin):
         self._jet_labels = self._jet_label_algorithm(y)
         # shuffles the data (It's important for the minimization algorithms)
         self._X, self._jet_labels = shuffle(self._X, self._jet_labels, random_state=42)
-        return np.copy(self._X)
+        return self._X.copy()
 
     @property
     def jet_labels(self):
@@ -222,3 +222,28 @@ class PreprocessingEFPs(JetProcessing):
             [jet[const_index + 2], jet[const_index], jet[const_index + 1]]
             for const_index in range(0, len(jet), 4) if jet[const_index + 3] == 1
         ])
+
+
+class JetProcessingParticleCloud(JetProcessing):
+
+    def __init__(self, jet_label_algorithm
+                 : Callable[
+                     [Dict[ParticleType, Tuple[int, int]]], np.ndarray] = create_jet_labels_one_column_per_category
+                 ):
+        super().__init__(jet_label_algorithm=jet_label_algorithm)
+
+    def prepare_X(self, X):
+        # each entry represent a jet
+        self._X = np.array([self.get_jet_constituents(jet) for jet in X])
+
+    @staticmethod
+    def get_jet_constituents(jet):
+        jets_constituents = np.array([
+             jet[jet_index: jet_index + 4] for jet_index in range(0, len(jet), 4)
+        ])
+        # the only normalization will take is the log of the pT
+        # since we have zero-padded particles, we must only take the look of the one where the mask == 1
+        real_particles = jets_constituents[:, 3] == 1
+        jets_constituents[real_particles, 2] = np.log(jets_constituents[real_particles, 2])
+
+        return jets_constituents
