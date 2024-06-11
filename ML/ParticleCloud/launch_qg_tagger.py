@@ -11,16 +11,15 @@ if __name__ == '__main__':
     # loading all the data
     data_gluon = pd.read_csv('Data/g_jets.csv', header=None, sep=' ')
     data_quark = pd.read_csv('Data/q_jets.csv', header=None, sep=' ')
-    data_top = pd.read_csv('Data/t_jets.csv', header=None, sep=' ')
 
     # joinning data frames
     all_jets = pd.concat(
-        [data_top, data_quark.loc[:int(len(data_quark) / 2), :], data_gluon.loc[:int(len(data_quark) / 2), :]], axis=0)
+        [data_quark, data_gluon], axis=0)
     all_jets.reset_index(drop=True, inplace=True)
     # defining the dictionary with the order of jets in the full data frame
     jets_order = {
-        ParticleType.Top: (0, len(data_top) - 1),
-        ParticleType.LightQuark: (len(data_top), len(all_jets) - 1),
+        ParticleType.LightQuark: (0, len(data_quark) - 1),
+        ParticleType.Gluon: (len(data_quark), len(all_jets) - 1),
     }
 
     jet_preprocessing = JetProcessingParticleCloud()
@@ -67,14 +66,14 @@ if __name__ == '__main__':
     y_test_pred = jet_tag_model.predict(X_test)
 
     print("Trainnig set:")
-    print(f"Recall for Top tagging: {recall_score(y_train[:, 0], y_train_pred[:, 0] > 0.5):.2f}")
-    print(f"Precision for Top tagging: {precision_score(y_train[:, 0], y_train_pred[:, 0] > 0.5):.2f}")
+    print(f"Recall for Quark tagging: {recall_score(y_train[:, 0], y_train_pred[:, 0] > 0.5):.2f}")
+    print(f"Precision for Quark tagging: {precision_score(y_train[:, 0], y_train_pred[:, 0] > 0.5):.2f}")
     print("Confusion Matrix")
     print(confusion_matrix(y_train[:, 0], y_train_pred[:, 0] > 0.5, labels=[0, 1]))
 
     print("Test set:")
-    print(f"Recall for Top tagging: {recall_score(y_test[:, 0], y_test_pred[:, 0] > 0.5):.2f}")
-    print(f"Precision for Top tagging: {precision_score(y_test[:, 0], y_test_pred[:, 0] > 0.5):.2f}")
+    print(f"Recall for Quark tagging: {recall_score(y_test[:, 0], y_test_pred[:, 0] > 0.5):.2f}")
+    print(f"Precision for Quark tagging: {precision_score(y_test[:, 0], y_test_pred[:, 0] > 0.5):.2f}")
     print("Confusion Matrix")
     print(confusion_matrix(y_test[:, 0], y_test_pred[:, 0] > 0.5, labels=[0, 1]))
 

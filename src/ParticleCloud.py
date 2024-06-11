@@ -98,7 +98,7 @@ class EdgeConvolutionLayer(Layer):
         def keep_all():
             return input_particles[:, :-1]
 
-        return tf.cond(has_zero_padded_particles, input_particles[:zero_padded_particles[0, 0], :-1], keep_all)
+        return tf.cond(has_zero_padded_particles, remove_zeros, keep_all)
 
     def _fix_number_of_particles(self, particles):
         """
