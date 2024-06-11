@@ -241,4 +241,9 @@ class JetProcessingParticleCloud(JetProcessing):
         jets_constituents = np.array([
              jet[jet_index: jet_index + 4] for jet_index in range(0, len(jet), 4)
         ])
+        # the only normalization will take is the log of the pT
+        # since we have zero-padded particles, we must only take the look of the one where the mask == 1
+        real_particles = jets_constituents[:, 3] == 1
+        jets_constituents[real_particles, 2] = np.log(jets_constituents[real_particles, 2])
+
         return jets_constituents

@@ -89,32 +89,36 @@ class EdgeConvolutionLayer(Layer):
     @staticmethod
     def remove_zero_padded_particles(input_particles):
         """Removes zero padded mask == 0 - assumes the last column is the mask"""
-        zero_padded_particles = tf.where(input_particles[:, -1] == 0).numpy()
-        if len(zero_padded_particles) > 0:
-            return input_particles[:zero_padded_particles[0][0], :-1]
-        return input_particles[:, :-1]
+        zero_padded_particles = tf.where(input_particles[:, -1] == 0)
+        has_zero_padded_particles = tf.shape(zero_padded_particles)[0] > 0
+
+        def remove_zeros():
+            return input_particles[:zero_padded_particles[0, 0], :-1]
+
+        def keep_all():
+            return input_particles[:, :-1]
+
+        return tf.cond(has_zero_padded_particles, input_particles[:zero_padded_particles[0, 0], :-1], keep_all)
 
     def _fix_number_of_particles(self, particles):
         """
         Checks if the total number of particles is equal to max_number_particles.
         If it's not, if adds vectors with zero entries to match the size of the matrix
         """
-        number_of_particles = particles.shape[0]
+        number_of_particles = tf.shape(particles)[0]
         # first we need to create a mask and set it to 1 for all true particles
         mask_true_particles = tf.ones(shape=[number_of_particles, 1], dtype=tf.float32)
         masked_particles = tf.concat([particles, mask_true_particles], axis=1)
+        # adjusting the vector
+        number_of_particles_to_add = self._max_number_particles - number_of_particles
+        zero_padded_particles = tf.zeros([number_of_particles_to_add, masked_particles.shape[1]], dtype=tf.float32)
 
-        # in case we need to add zero padded particles
-        if number_of_particles < self._max_number_particles:
-            number_of_particles_to_add = self._max_number_particles - number_of_particles
-            zero_padded_particles = tf.zeros([number_of_particles_to_add, masked_particles.shape[1]], dtype=tf.float32)
-            masked_particles = tf.concat([masked_particles, zero_padded_particles], axis=0)
-
-        return masked_particles
+        return tf.concat([masked_particles, zero_padded_particles], axis=0)
 
     def compute_output_shape(self, input_shape):
         batch_size = input_shape[0]
-        return batch_size, self._max_number_particles, self._mlp_output_dim
+        # the last plus one is because we are adding the mask
+        return batch_size, self._max_number_particles, self._mlp_output_dim + 1
 
 
 class ChannelWiseGlobalAvaragePooling(tf.keras.layers.Layer):
@@ -129,9 +133,10 @@ class ChannelWiseGlobalAvaragePooling(tf.keras.layers.Layer):
         # calculating the channel-wise avarage for each particle
         return tf.reduce_mean(particles, axis=0)
 
-
-
-
+    def compute_output_shape(self, input_shape):
+        batch_size = input_shape[0]
+        # the output shape is the number of features of each particle - 1 (not including the mask)
+        return batch_size, input_shape[-1] - 1
 
 # class EdgeConvolutionLayerSimple(Layer):
 #     """Implements the Edge Convolution Layer in a simple way - not optimized"""
