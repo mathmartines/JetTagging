@@ -4,5 +4,7 @@ env
 **/.idea
 **/__pycache__
 **/.pytest_cache
-**/Data
+**/Data/Test
+**/Data/Trainning
+**/Data/Validation
 /ML/EFPs/.ipynb_checkpoints
