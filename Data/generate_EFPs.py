@@ -3,7 +3,7 @@ Running the EFPs on the full dataset takes a long time to run it all once and st
 of performing the calculation many times.
 """
 
-from src.Preprocessing import PreprocessingEFPs, create_labels_single_column
+from src.Preprocessing.JetPreprocessing import PreprocessingEFPs, create_labels_single_column
 from src.Particle import ParticleType
 import pandas as pd
 import numpy as np

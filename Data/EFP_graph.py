@@ -1,6 +1,6 @@
 """Quick script to find the corresponding graphs for the EFPs"""
 
-from src.Preprocessing import PreprocessingEFPs, create_labels_single_column
+from src.Preprocessing.JetPreprocessing import PreprocessingEFPs, create_labels_single_column
 
 if __name__ == "__main__":
     # Only EFPs with degree <= 5 and fully connected
