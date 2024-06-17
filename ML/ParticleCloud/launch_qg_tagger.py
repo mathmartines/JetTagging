@@ -9,8 +9,8 @@ from sklearn.metrics import recall_score, precision_score, confusion_matrix, roc
 
 if __name__ == '__main__':
     # loading all the data
-    data_gluon = pd.read_csv('Data/g_jets.csv', header=None, sep=' ')
-    data_quark = pd.read_csv('Data/q_jets.csv', header=None, sep=' ')
+    data_gluon = pd.read_csv('../../Data/g_jets.csv', header=None, sep=' ')
+    data_quark = pd.read_csv('../../Data/q_jets.csv', header=None, sep=' ')
 
     # joinning data frames
     all_jets = pd.concat(
@@ -48,8 +48,8 @@ if __name__ == '__main__':
 
     jet_tag_model = keras.Sequential([
         keras.layers.InputLayer(shape=(30, 4)),
-        EdgeConvolutionLayer(mlp=mlp_jets_first, k_neighbors=5, final_index_coord=2, max_number_particles=30),
-        EdgeConvolutionLayer(mlp=mlp_jets_second, k_neighbors=5, final_index_coord=8, max_number_particles=30),
+        EdgeConvolutionLayer(mlp=mlp_jets_first, k_neighbors=4, final_index_coord=2, max_number_particles=30),
+        EdgeConvolutionLayer(mlp=mlp_jets_second, k_neighbors=4, final_index_coord=8, max_number_particles=30),
         ChannelWiseGlobalAvaragePooling(),
         keras.layers.Dense(128, activation='relu'),
         keras.layers.Dropout(rate=0.05),

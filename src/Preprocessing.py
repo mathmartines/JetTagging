@@ -1,6 +1,5 @@
 from typing import Tuple, Dict, Callable
 from sklearn.base import TransformerMixin, BaseEstimator
-from sklearn.utils import shuffle
 from src.JetImage import JetImage, IntensityPtCalculator, JetImageCalculatorPandas
 from src.Particle import ParticleType
 from abc import ABC, abstractmethod
@@ -85,36 +84,24 @@ def create_jet_labels_one_column_per_category(jet_inputs):
 class JetProcessing(ABC, BaseEstimator, TransformerMixin):
     """Abstract class to process the jet input data for the ML algorithms."""
 
-    def __init__(self, jet_label_algorithm: Callable[[Dict[ParticleType, Tuple[int, int]]], np.ndarray]):
-        self._jet_labels = None
+    def __init__(self):
         self._X = None
-        self._jet_label_algorithm = jet_label_algorithm
 
-    def fit(self, X, y=None):
-        # default (does nothing)
-        return self
-
-    def transform(self, X, y: Dict[ParticleType, Tuple[int, int]]):
+    def transform(self, X):
         """
         Creates the data for the ML image algorithms.
         It uses the prepare_X methods declared by the subclases to prepare the data for the ML image algorithms.
 
         :param X: list of jet per row, just as it's in the initial database
-        :param y: order of the data as specified by create_jet_labels function
         :return: the data processed for the ML image algorithms
         """
-        self.prepare_X(X)
-        self._jet_labels = self._jet_label_algorithm(y)
-        # shuffles the data (It's important for the minimization algorithms)
-        self._X, self._jet_labels = shuffle(self._X, self._jet_labels, random_state=42)
+        self.prepare_data(X)
+        # copying to ensure that any modification on the class attribute X is not propagated to
+        # other places
         return self._X.copy()
 
-    @property
-    def jet_labels(self):
-        return self._jet_labels
-
     @abstractmethod
-    def prepare_X(self, X):
+    def prepare_data(self, X):
         """How to preprocess the data for the algorithm"""
         raise NotImplementedError("Please use one of the subclasses")
 
@@ -127,16 +114,8 @@ class PreprocessingJetImages(JetProcessing):
     It delegates the work to the JetImages class.
     """
 
-    def __init__(self,
-                 phi_range: Tuple[float, float],
-                 eta_range: Tuple[float, float],
-                 n_bins_phi: int,
-                 n_bins_eta: int,
-                 jet_image_strategy: IntensityPtCalculator = JetImageCalculatorPandas(),
-                 jet_label_algorithm
-                 : Callable[
-                     [Dict[ParticleType, Tuple[int, int]]], np.ndarray] = create_jet_labels_one_column_per_category
-                 ):
+    def __init__(self, phi_range: Tuple[float, float], eta_range: Tuple[float, float], n_bins_phi: int,
+                 n_bins_eta: int, jet_image_strategy: IntensityPtCalculator = JetImageCalculatorPandas()):
         """
         All the parameters that are required to initialize the image.
 
@@ -155,9 +134,9 @@ class PreprocessingJetImages(JetProcessing):
             n_bins_eta=n_bins_eta,
             pt_intensity_calculator=jet_image_strategy
         )
-        super().__init__(jet_label_algorithm=jet_label_algorithm)
+        super().__init__()
 
-    def prepare_X(self, X):
+    def prepare_data(self, X):
         """
         Creates the data for the ML image algorithms.
         It sets up jet image using the JetImage class and the transform
@@ -178,22 +157,21 @@ class PreprocessingEFPs(JetProcessing):
     To process the data the degree d of the polynomial must be given.
     """
 
-    def __init__(self, d: int,
-                 jet_label_algorithm: Callable[
-                     [Dict[ParticleType, Tuple[int, int]]], np.ndarray] = create_labels_single_column, *args):
+    def __init__(self, d: int, *args):
         """
         It will transform the jet substructure to a set of polynomial with degree up to d.
 
         :param d: degree of the polynomial.
         """
+        super().__init__()
         self._efps_set = ef.EFPSet(("d<=", d), *args, measure='hadr', beta=1, normed=False, verbose=True)
-        super().__init__(jet_label_algorithm=jet_label_algorithm)
+
 
     @property
     def efps_set(self):
         return self._efps_set
 
-    def prepare_X(self, X):
+    def prepare_data(self, X):
         """
         Tranforms the input jets into a set of polynomials up to degree d.
 
@@ -201,11 +179,7 @@ class PreprocessingEFPs(JetProcessing):
         :param y: order of the data as specified by create_jet_labels function
         :return: the X data for the ML algorithms that uses the Energy Flow Polynomials as input features
         """
-        # we remove the first polynomial which has degree 0
-        # the degree 0 is just a constant
-        # when looking to the graphs that corresponds to each column we should look to the graphs
-        # with index i + 1
-        self._X = np.array([self._efps_set.compute(self._get_jet_constituents(jet))[1:] for jet in X])
+        self._X = np.array([self._efps_set.compute(self._get_jet_constituents(jet)) for jet in X])
 
     @staticmethod
     def _get_jet_constituents(jet) -> np.ndarray:
@@ -226,13 +200,7 @@ class PreprocessingEFPs(JetProcessing):
 
 class JetProcessingParticleCloud(JetProcessing):
 
-    def __init__(self, jet_label_algorithm
-                 : Callable[
-                     [Dict[ParticleType, Tuple[int, int]]], np.ndarray] = create_jet_labels_one_column_per_category
-                 ):
-        super().__init__(jet_label_algorithm=jet_label_algorithm)
-
-    def prepare_X(self, X):
+    def prepare_data(self, X):
         # each entry represent a jet
         self._X = np.array([self.get_jet_constituents(jet) for jet in X])
 
