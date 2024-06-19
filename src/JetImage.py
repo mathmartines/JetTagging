@@ -1,10 +1,8 @@
 from __future__ import annotations
-from typing import Tuple, List
+from typing import Tuple
 import numpy as np
 from abc import ABC, abstractmethod
 import pandas as pd
-
-from src.Particle import Jet
 
 
 class JetImage:
@@ -86,17 +84,17 @@ class IntensityPtCalculator(ABC):
     def set_jet_image(self, jet_image: JetImage):
         self._jet_image = jet_image
 
-
-class JetImageCalculator(IntensityPtCalculator):
-    """Evaluates the pT intensity in each pixel of a Jet object"""
-
-    def calculate_intensity(self, jet: Jet):
-        """Updates the jet image with the jet constituents pT"""
-        for jet_constituent in jet:
-            jet_momentum = jet_constituent.momentum
-            self._jet_image.update_jet_image(
-                eta_value=jet_momentum.eta, phi_value=jet_momentum.phi, pt_value=jet_momentum.pt
-            )
+# obsoleto: estamos usando direto do pandas
+# class JetImageCalculator(IntensityPtCalculator):
+#     """Evaluates the pT intensity in each pixel of a Jet object"""
+#
+#     def calculate_intensity(self, jet: Jet):
+#         """Updates the jet image with the jet constituents pT"""
+#         for jet_constituent in jet:
+#             jet_momentum = jet_constituent.momentum
+#             self._jet_image.update_jet_image(
+#                 eta_value=jet_momentum.eta, phi_value=jet_momentum.phi, pt_value=jet_momentum.pt
+#             )
 
 
 class JetImageCalculatorPandas(IntensityPtCalculator):
@@ -126,7 +124,7 @@ class JetImageAvarageCalculator(IntensityPtCalculator):
         # modified
         self._jet_image_calculator.set_jet_image(jet_image)
 
-    def calculate_intensity(self, jet: List[Jet]):
+    def calculate_intensity(self, jet):
         """Calculates the avarge in intensity for each pixel of a list of Jet objects."""
         # calculating image for each jet
         for jet_object in jet:

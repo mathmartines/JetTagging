@@ -1,14 +1,14 @@
 """Quick script to find the corresponding graphs for the EFPs"""
 
-from src.Preprocessing.JetPreprocessing import PreprocessingEFPs, create_labels_single_column
+from src.Preprocessing.JetPreprocessing import PreprocessingEFPs
 
 if __name__ == "__main__":
     # Only EFPs with degree <= 5 and fully connected
-    efp_processing = PreprocessingEFPs(5, create_labels_single_column, ("p==", 1))
+    efp_processing = PreprocessingEFPs(5,  ("p==", 1))
     efp_set = efp_processing.efps_set
 
     # information about each polynomial
-    index = 0  # column index of the EFP dataset
+    index = 2  # column index of the EFP dataset
     graph = efp_set.graphs(index)
 
     n, _, d, v, _, c, p, _ = efp_set.specs[index]
