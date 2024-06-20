@@ -139,7 +139,8 @@ class JetProcessingParticleCloud(JetProcessing):
     @staticmethod
     def get_jet_constituents(jet):
         jets_constituents = np.array([
-             jet[jet_index: jet_index + 4] for jet_index in range(0, len(jet), 4)
+             [*jet[jet_index: jet_index + 3], np.sqrt(jet[jet_index]**2 + jet[jet_index + 1]**2), jet[jet_index + 3]]
+             for jet_index in range(0, len(jet), 4)
         ])
         # the only normalization will take is the log of the pT
         # since we have zero-padded particles, we must only take the look of the one where the mask == 1
