@@ -80,7 +80,7 @@ class PreprocessingJetImages(JetProcessing):
         :param X: numpy array taken from the pandas dataframe
         :return: the data processed for the ML image algorithms
         """
-        self._X = np.array([self._jet_image.create_jet_image(jet_features).reshape(-1) for jet_features in X])
+        self._X = np.array([self._jet_image.create_jet_image(jet_features) for jet_features in X])
 
 
 class PreprocessingEFPs(JetProcessing):
