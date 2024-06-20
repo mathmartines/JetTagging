@@ -11,7 +11,7 @@ defined by the output of the MLP.
 """
 
 import tensorflow as tf
-from tensorflow import keras
+import keras
 
 
 class PointNetLayer(keras.layers.Layer):
@@ -77,4 +77,20 @@ class PointNetLayer(keras.layers.Layer):
         number_of_particles = input_shape[1]
         return batch_size, number_of_particles, self._mlp_output_dim + 1
 
+    def get_config(self):
+        """Configurations of the NN besides the default ones"""
+        # base configurations
+        base_config = super().get_config()
+        # custom configurations
+        config = {
+            "mlp": keras.saving.serialize_keras_object(self._mlp),
+            "mlp_output_dim": self._mlp_output_dim
+        }
+        return {**base_config, **config}
 
+    @classmethod
+    def from_config(cls, config):
+        """Extraciting the MLP when loading the model."""
+        mlp = config.pop("mlp")
+        mlp = keras.saving.deserialize_keras_object(mlp)
+        return cls(mlp, **config)
