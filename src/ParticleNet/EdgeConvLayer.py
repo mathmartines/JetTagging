@@ -36,19 +36,18 @@ class EdgeConvLayer(keras.layers.Layer):
         # only non zero padded particles
         real_particles = self._get_real_particles(particles)
         # number of real particles in the event
-        number_of_particles = tf.shape(particles)[0]
+        number_of_particles = tf.shape(real_particles)[0]
 
         # getting the coordinates of each particle and using them to find the neighbors
-        coordinates = real_particles[:, 0: self._final_index_coord]
+        coordinates = real_particles[:, : self._final_index_coord]
         neighbors_indices = self._find_neighbors(coordinates)
 
         # creating the features for each edge
         # excluding the last column since we do not need anymore
-        edges = self._create_edge_features(real_particles[:, -1], neighbors_indices)
+        edges = self._create_edge_features(real_particles[:, :-1], neighbors_indices)
 
         # evaluating the MLP on each edge
         mlp_output = self._mlp(edges)
-
         # taking the feature-wise average over all the edges for a particle
         final_cloud_particles = self._feature_wise_average(mlp_output, number_of_particles)
 
@@ -119,3 +118,24 @@ class EdgeConvLayer(keras.layers.Layer):
         batch_size = input_shape[0]
         # the last plus one is because we are adding the mask
         return batch_size, self._max_number_particles, self._mlp_output_dim + 1
+
+    def get_config(self):
+        """Configurations of the NN besides the default ones"""
+        # base configurations
+        base_config = super().get_config()
+        # custom configurations
+        config = {
+            "mlp": keras.saving.serialize_keras_object(self._mlp),
+            "mlp_output_dim": self._mlp_output_dim,
+            "final_index_coord": self._final_index_coord,
+            "max_number_particles": self._max_number_particles,
+            "k_neighbors": self._k_neighbors
+        }
+        return {**base_config, **config}
+
+    @classmethod
+    def from_config(cls, config):
+        """Extraciting the MLP when loading the model."""
+        mlp = config.pop("mlp")
+        mlp = keras.saving.deserialize_keras_object(mlp)
+        return cls(mlp, **config)
