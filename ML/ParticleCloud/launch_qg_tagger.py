@@ -1,6 +1,6 @@
 import pandas as pd
 from tensorflow import keras
-from src.ParticleCloud import EdgeConvolutionLayer, ChannelWiseGlobalAvaragePooling
+from src.ParticleNet.EdgeConvLayer import EdgeConvolutionLayer, ChannelWiseGlobalAvaragePooling
 from src.Preprocessing.JetPreprocessing import JetProcessingParticleCloud
 from src.Particle import ParticleType
 from sklearn.model_selection import train_test_split

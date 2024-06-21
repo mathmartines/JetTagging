@@ -11,7 +11,7 @@ defined by the output of the MLP.
 """
 
 import tensorflow as tf
-from tensorflow import keras
+import keras
 
 
 class PointNetLayer(keras.layers.Layer):
@@ -35,7 +35,7 @@ class PointNetLayer(keras.layers.Layer):
         :return: Tensor of shape (batch_size, num_particles, mlp_output_dim + 1)
                  where each particle has a new set of features defined by the MLP.
         """
-        # shape of the input events
+        # Shape of the input events
         input_shape = tf.shape(events)
         num_of_events, num_particles_per_event, num_particles_features = input_shape[0], input_shape[1], input_shape[2]
         # Reshape to have a list of particles
@@ -77,4 +77,20 @@ class PointNetLayer(keras.layers.Layer):
         number_of_particles = input_shape[1]
         return batch_size, number_of_particles, self._mlp_output_dim + 1
 
+    def get_config(self):
+        """Configurations of the NN besides the default ones"""
+        # base configurations
+        base_config = super().get_config()
+        # custom configurations
+        config = {
+            "mlp": keras.saving.serialize_keras_object(self._mlp),
+            "output_dim": self._mlp_output_dim
+        }
+        return {**base_config, **config}
 
+    @classmethod
+    def from_config(cls, config):
+        """Extraciting the MLP when loading the model."""
+        mlp = config.pop("mlp")
+        mlp = keras.saving.deserialize_keras_object(mlp)
+        return cls(mlp, **config)
