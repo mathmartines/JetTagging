@@ -32,17 +32,15 @@ def load_data_top_tagging(top_quark_path: str, quark_data_path: str,
                           gluon_data_path: str) -> Tuple[np.ndarray, np.ndarray]:
     """Loads the data for the Top-tagging NN"""
     # loading the data files for the top, quark, and gluon jets
-    data_top = pd.read_csv(top_quark_path, header=None)
-    data_quark = pd.read_csv(quark_data_path, header=None)
-    data_gluon = pd.read_csv(gluon_data_path, header=None)
+    data_top = pd.read_csv(top_quark_path, header=None).to_numpy()
+    data_quark = pd.read_csv(quark_data_path, header=None).to_numpy()
+    data_gluon = pd.read_csv(gluon_data_path, header=None).to_numpy()
     # selecting only half of quarks and gluons
-    all_jets = pd.concat(
-        [data_top, data_quark[:int(len(data_quark)/2) + 1], data_gluon[:int(len(data_gluon/2)) + 1]], axis=0)
-    all_jets.reset_index(drop=True, inplace=True)  # reset the indices
+    all_jets = np.vstack([data_top, data_quark[:int(len(data_quark)/2)], data_gluon[:int(len(data_gluon)/2)]])
 
     # preprocessing class
     jet_preprocessing = JetProcessingParticleCloud()
-    X = jet_preprocessing.transform(all_jets.to_numpy())
+    X = jet_preprocessing.transform(all_jets)
     # labels
     y = create_jet_labels_one_column_per_category(
         [(0, data_top.shape[0] - 1), (data_top.shape[0], all_jets.shape[0] - 1)]
