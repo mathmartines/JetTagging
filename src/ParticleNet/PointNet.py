@@ -35,7 +35,7 @@ class PointNetLayer(keras.layers.Layer):
         :return: Tensor of shape (batch_size, num_particles, mlp_output_dim + 1)
                  where each particle has a new set of features defined by the MLP.
         """
-        # shape of the input events
+        # Shape of the input events
         input_shape = tf.shape(events)
         num_of_events, num_particles_per_event, num_particles_features = input_shape[0], input_shape[1], input_shape[2]
         # Reshape to have a list of particles
@@ -84,7 +84,7 @@ class PointNetLayer(keras.layers.Layer):
         # custom configurations
         config = {
             "mlp": keras.saving.serialize_keras_object(self._mlp),
-            "mlp_output_dim": self._mlp_output_dim
+            "output_dim": self._mlp_output_dim
         }
         return {**base_config, **config}
 
