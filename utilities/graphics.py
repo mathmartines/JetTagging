@@ -12,19 +12,20 @@ plt.rcParams.update({'font.size': 15})
 
 
 def plot_roc_curve(
-        signal_eff: Dict[str, np.ndarray], background_eff: Dict[str, np.ndarray], labels: Dict[str, str],
-        colors: Dict[str, str], file_path=None
+        signal_eff: Dict[str, np.ndarray], background_rej: Dict[str, np.ndarray], labels: Dict[str, str],
+        colors: Dict[str, str], title, file_path=None
 ):
     """Plots the roc curve for a list of classifiers"""
 
     for classifier in signal_eff:
-        plt.plot(signal_eff[classifier], background_eff[classifier], label=labels[classifier],
+        plt.plot(signal_eff[classifier], background_rej[classifier], label=labels[classifier],
                  color=colors[classifier])
     plt.plot([0, 1], [1, 0], 'k--')
     plt.ylabel(r"Background Rejection ($1 - \varepsilon_b$)")
     plt.xlabel(r"Signal Efficiency ($\varepsilon_s$)")
     plt.xlim((0, 1))
     plt.ylim((0, 1))
+    plt.title(title)
     plt.tick_params(axis="both", which="minor", top=True, right=True, length=2, direction="in")
     plt.tick_params(axis="both", which="major", top=True, right=True, length=5, direction="in")
     plt.legend(loc="best", frameon=False, framealpha=1, fontsize="12", fancybox=False)
