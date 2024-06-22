@@ -1,0 +1,98 @@
+def calculate_num_constituents(jet_data):
+    num_constituents = []
+    
+    for i in range(len(jet_data)):
+        # Transforma os dados de um jato em um array 2D com 4 colunas
+        jato = jet_data.iloc[i].values.reshape(-1, 4)
+        
+        # Conta o número de constituintes válidos (mask == 1)
+        num_valid_constituents = sum(jato[:, 3] == 1)
+        
+        num_constituents.append(num_valid_constituents)
+    
+    return num_constituents
+
+def process_num_constituents(data_quark, data_gluon, data_top):
+    print("Loading data...")
+    
+    # Leitura dos dados
+    df_quark = pd.read_csv(data_quark, header=None, sep=',')
+    df_gluon = pd.read_csv(data_gluon, header=None, sep=',')
+    df_top = pd.read_csv(data_top, header=None, sep=',')
+    
+    print("Calculating number of constituents for quark jets...")
+    # Cálculo do número de constituintes para quark jets
+    num_constituents_quark = calculate_num_constituents(df_quark)
+    
+    print("Calculating number of constituents for gluon jets...")
+    # Cálculo do número de constituintes para gluon jets
+    num_constituents_gluon = calculate_num_constituents(df_gluon)
+    
+    print("Calculating number of constituents for top jets...")
+    # Cálculo do número de constituintes para top jets
+    num_constituents_top = calculate_num_constituents(df_top)
+    
+    return num_constituents_quark, num_constituents_gluon, num_constituents_top
+
+
+
+import os
+import numpy as np
+import pandas as pd
+
+# Diretórios de destino
+training_dir = '/eos/home-i03/m/mdemelop/SWAN_projects/ML/Seminario/Data/Trainning'
+test_dir = '/eos/home-i03/m/mdemelop/SWAN_projects/ML/Seminario/Data/Test'
+validation_dir = '/eos/home-i03/m/mdemelop/SWAN_projects/ML/Seminario/Data/Validation'
+
+root_data_folder = '/eos/home-i03/m/mdemelop/SWAN_projects/ML/Seminario/Data/'
+
+
+# Definindo os arquivos de dados
+
+data_train_quark = f'{root_data_folder}Trainning/q_jets.csv'
+data_train_gluon = f'{root_data_folder}Trainning/g_jets.csv'
+data_train_top = f'{root_data_folder}Trainning/t_jets.csv'
+
+data_test_quark = f'{root_data_folder}Test/q_jets.csv'
+data_test_gluon = f'{root_data_folder}Test/g_jets.csv'
+data_test_top = f'{root_data_folder}Test/t_jets.csv'
+
+data_val_quark = f'{root_data_folder}Validation/q_jets.csv'
+data_val_gluon = f'{root_data_folder}Validation/g_jets.csv'
+data_val_top = f'{root_data_folder}Validation/t_jets.csv'
+
+
+# Chamando a função para os dados de treinamento
+num_constituents_quark_train, num_constituents_gluon_train, num_constituents_top_train = process_num_constituents(
+    data_quark=data_train_quark,
+    data_gluon=data_train_gluon,
+    data_top=data_train_top
+)
+
+# Chamando a função para os dados de teste
+num_constituents_quark_test, num_constituents_gluon_test, num_constituents_top_test = process_num_constituents(
+    data_quark=data_test_quark,
+    data_gluon=data_test_gluon,
+    data_top=data_test_top
+)
+
+# Chamando a função para os dados de validação
+num_constituents_quark_val, num_constituents_gluon_val, num_constituents_top_val = process_num_constituents(
+    data_quark=data_val_quark,
+    data_gluon=data_val_gluon,
+    data_top=data_val_top
+)
+
+# Salvando os resultados para cada tipo de jet separadamente
+np.save(os.path.join(training_dir, 'num_constituents_q.npy'), num_constituents_quark_train)
+np.save(os.path.join(training_dir, 'num_constituents_g.npy'), num_constituents_gluon_train)
+np.save(os.path.join(training_dir, 'num_constituents_t.npy'), num_constituents_top_train)
+
+np.save(os.path.join(test_dir, 'num_constituents_q.npy'), num_constituents_quark_test)
+np.save(os.path.join(test_dir, 'num_constituents_g.npy'), num_constituents_gluon_test)
+np.save(os.path.join(test_dir, 'num_constituents_t.npy'), num_constituents_top_test)
+
+np.save(os.path.join(validation_dir, 'num_constituents_q.npy'), num_constituents_quark_val)
+np.save(os.path.join(validation_dir, 'num_constituents_g.npy'), num_constituents_gluon_val)
+np.save(os.path.join(validation_dir, 'num_constituents_t.npy'), num_constituents_top_val)
