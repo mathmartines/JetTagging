@@ -6,5 +6,6 @@ env
 **/.pytest_cache
 **/Data/Test
 **/Data/Trainning
+**/Data
 **/Data/Validation
 /ML/EFPs/.ipynb_checkpoints
