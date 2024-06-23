@@ -29,7 +29,8 @@ def plot_roc_curve(
     plt.title(title)
     plt.tick_params(axis="both", which="minor", top=True, right=True, length=2, direction="in")
     plt.tick_params(axis="both", which="major", top=True, right=True, length=5, direction="in")
-    plt.legend(loc="best", frameon=False, framealpha=1, fontsize="11", fancybox=False)
+    legend = plt.legend(loc="best", frameon=True, framealpha=1, fontsize="11", fancybox=False)
+    legend.get_frame().set_edgecolor('none')
     plt.minorticks_on()
     if file_path is not None:
         plt.savefig(file_path, format="png", bbox_inches="tight", dpi=300)
@@ -45,7 +46,8 @@ def plot_metric_per_epoch(metrics: Dict[str, np.ndarray], labels: Dict[str, str]
         line_type = "dashed" if "val" in metric else "solid"
         plt.plot(metrics[metric], label=labels[metric], color=colors[metric], linestyle=line_type)
 
-    plt.legend(loc="best", frameon=False, framealpha=1, fontsize="11", fancybox=False, ncols=1)
+    legend = plt.legend(loc="best", frameon=True, framealpha=1, fontsize="11", fancybox=False, ncols=2)
+    legend.get_frame().set_edgecolor('none')
     plt.xlim(xlim)
     plt.tick_params(axis="both", which="minor", top=True, right=True, length=2, direction="in")
     plt.tick_params(axis="both", which="major", top=True, right=True, length=5, direction="in")

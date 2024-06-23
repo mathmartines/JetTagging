@@ -8,7 +8,7 @@ if __name__ == "__main__":
     efp_set = efp_processing.efps_set
 
     # information about each polynomial
-    index = 2  # column index of the EFP dataset
+    index = 18     # column index of the EFP dataset
     graph = efp_set.graphs(index)
 
     n, _, d, v, _, c, p, _ = efp_set.specs[index]

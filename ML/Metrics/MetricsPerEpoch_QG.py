@@ -14,14 +14,15 @@ if __name__ == "__main__":
     # loading models
     model_files = {
         "imagem": "../CNN/QuarkGluonTagger/Quark_Gluon_Tagging_CNN.json",
+        "efps": "../EFPs/NN/NN_EFPs_QG_Tagging.json",
         "point_net": "../ParticleCloud/PointNet/QuarkGluon_Tagging_PointNet.json",
-        "particle_cloud": "../ParticleCloud/ParticleNet/QuarkGluon_Tagging_ParticleCloud.json",
+        "particle_cloud": "../ParticleCloud/ParticleNet/QuarkGluon_Tagging_ParticleCloud_Final.json",
     }
     # metrics for each of the models
     all_metrics = {model: load_json(model_file) for model, model_file in model_files.items()}
 
     # desired metric
-    metric = "loss"
+    metric = "accuracy"
     dict_metrics = {}
     for model_name in all_metrics:
         dict_metrics[model_name] = all_metrics[model_name][metric]
@@ -31,6 +32,8 @@ if __name__ == "__main__":
     color_dict = {
         "val_imagem": "#01204E",
         "imagem": "#01204E",
+        "val_efps": "#0A6847",
+        "efps": "#0A6847",
         "point_net": "darkgray",
         "val_point_net": "darkgray",
         "particle_cloud": "#A34343",
@@ -40,20 +43,20 @@ if __name__ == "__main__":
     labels_dict = {
         "val_imagem": f"CNN - JetImages Validation",
         "imagem": f"CNN - JetImages Trainning",
+        "val_efps": r"CNN - EFPs + mean $\Delta R_{ij}$ Validation",
+        "efps": r"CNN - EFPs + mean $\Delta R_{ij}$ Trainning",
         "point_net": f"Point-Net Trainning",
         "val_point_net": f"Point-Net Validation",
         "particle_cloud": f"Particle Cloud Trainning",
         "val_particle_cloud": f"Particle Cloud Validation",
-        # "combined": f"Point-Net + Particle Cloud Trainning",
-        # "val_combined": f"Point-Net + Particle Cloud Validation"
     }
 
     plot_metric_per_epoch(
         metrics=dict_metrics,
         labels=labels_dict,
         colors=color_dict,
-        xlim=(0, 100),
-        metric_name="Loss",
+        xlim=(0, 80),
+        metric_name="Accuracy",
         title="Quark-Gluon Tagger",
-        file_path="../../Plots/PerEpoch/Loss_QG_Tagger.pdf"
+        file_path="../../Plots/PerEpoch/QuakGluonTagger/Acc_ParticleCloud.png"
     )

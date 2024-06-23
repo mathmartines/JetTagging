@@ -100,7 +100,7 @@ class IntensityPtCalculator(ABC):
 class JetImageCalculatorPandas(IntensityPtCalculator):
     """Evaluates the pT intensity in each pixel of a Jet, where a jet is just a line of the pandas data frame."""
 
-    def calculate_intensity(self, jet: pd.Series):
+    def calculate_intensity(self, jet):
         """Updates the jet image with the jet constituents pT"""
         # looping over all the jets
         for jet_index in range(0, len(jet), 4):

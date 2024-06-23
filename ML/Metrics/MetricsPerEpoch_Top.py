@@ -14,8 +14,9 @@ if __name__ == "__main__":
     # loading models
     model_files = {
         "imagem": "../CNN/Top tagger/top-tagger-final.json",
-        # "point_net": "../ParticleCloud/PointNet/Top_Tagging_PointNet.json",
-        # "particle_cloud": "../ParticleCloud/ParticleNet/Top_Tagging_ParticleCloud.json",
+        "efps": "../EFPs/NN/NN_EFPs_Top_Tagging.json",
+        "point_net": "../ParticleCloud/PointNet/Top_Tagging_PointNet.json",
+        "particle_cloud": "../ParticleCloud/ParticleNet/Top_Tagging_ParticleCloud_Final.json",
     }
     # metrics for each of the models
     all_metrics = {model: load_json(model_file) for model, model_file in model_files.items()}
@@ -31,6 +32,8 @@ if __name__ == "__main__":
     color_dict = {
         "val_imagem": "#01204E",
         "imagem": "#01204E",
+        "val_efps": "#0A6847",
+        "efps": "#0A6847",
         "point_net": "darkgray",
         "val_point_net": "darkgray",
         "particle_cloud": "#A34343",
@@ -40,6 +43,8 @@ if __name__ == "__main__":
     labels_dict = {
         "val_imagem": f"CNN - JetImages Validation",
         "imagem": f"CNN - JetImages Trainning",
+        "val_efps": r"CNN - EFPs + mean $\Delta R_{ij}$ Validation",
+        "efps": r"CNN - EFPs + mean $\Delta R_{ij}$ Trainning",
         "point_net": f"Point-Net Trainning",
         "val_point_net": f"Point-Net Validation",
         "particle_cloud": f"Particle Cloud Trainning",
@@ -52,8 +57,8 @@ if __name__ == "__main__":
         metrics=dict_metrics,
         labels=labels_dict,
         colors=color_dict,
-        xlim=(0, 50),
+        xlim=(0, 80),
         metric_name="Accuracy",
         title="Top Tagger",
-        file_path="../../Plots/PerEpoch/Acc_Top_Tagger_Imagem.png"
+        file_path="../../Plots/PerEpoch/TopTagger/Acc_Top_Tagger_ParticleCloud.png"
     )
