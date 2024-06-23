@@ -1,7 +1,7 @@
 # models
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling1D, Conv1D, BatchNormalization
+from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling1D, Conv1D, BatchNormalization, InputLayer
 
 
 #Função para construir o modelo a partir do
@@ -66,7 +66,8 @@ def build_model_a(input_shape):
     model = Sequential()
     
     # Primeira camada Conv1D para simular EdgeConv
-    model.add(Conv1D(64, 16, activation='relu', input_shape=input_shape))
+    model.add(InputLayer(shape=input_shape))
+    model.add(Conv1D(64, 16, activation='relu'))
     model.add(Conv1D(64, 1, activation='relu'))
     model.add(Conv1D(64, 1, activation='relu'))
     

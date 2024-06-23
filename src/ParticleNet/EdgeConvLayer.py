@@ -18,7 +18,8 @@ class EdgeConvLayer(keras.layers.Layer):
     EdgeConvolution layers objects.
     """
 
-    def __init__(self, mlp, mlp_output_dim, final_index_coord, max_number_particles, k_neighbors, **kwargs):
+    def __init__(self, mlp, n_particles_features, mlp_output_dim, final_index_coord, max_number_particles, k_neighbors,
+                 **kwargs):
         super().__init__(**kwargs)
         # stores the MLP that will be used as the edge function
         self._mlp = mlp
@@ -26,6 +27,10 @@ class EdgeConvLayer(keras.layers.Layer):
         self._k_neighbors = k_neighbors
         self._final_index_coord = final_index_coord
         self._max_number_particles = max_number_particles
+        # number of particles features
+        self._n_particles_features = n_particles_features
+        # relu activation function
+        self._leaky_relu = keras.activations.leaky_relu
 
     def call(self, events):
         """Evaluates the EdgeConvolution layer on each event sample."""
@@ -51,9 +56,15 @@ class EdgeConvLayer(keras.layers.Layer):
         # taking the feature-wise average over all the edges for a particle
         final_cloud_particles = self._feature_wise_average(mlp_output, number_of_particles)
 
+        # aggregation step: new features together with the old features
+        new_particles_features = self._aggregate_features(final_cloud_particles, real_particles[:, :-1])
+
+        # using the final activation function
+        new_particles_features = self._leaky_relu(new_particles_features)
+
         # we need to ensure that the size of the output is fixed
         # to do so, we add a mask column (1 True particles, 0 ZeroPadded particles)
-        return self._fix_number_of_particles(final_cloud_particles)
+        return self._fix_number_of_particles(new_particles_features)
 
     def _find_neighbors(self, coordinates):
         """Finds the k-nearest neighbors for all the particles"""
@@ -113,11 +124,16 @@ class EdgeConvLayer(keras.layers.Layer):
 
         return tf.concat([masked_particles, zero_padded_particles], axis=0)
 
+    @staticmethod
+    def _aggregate_features(particle_cloud, particles):
+        """Aggregates the features of the particle cloud with the particle features."""
+        return tf.concat([particle_cloud, particles], axis=-1)
+
     def compute_output_shape(self, input_shape):
         """Returns the shape of the output tensor."""
         batch_size = input_shape[0]
         # the last plus one is because we are adding the mask
-        return batch_size, self._max_number_particles, self._mlp_output_dim + 1
+        return batch_size, self._max_number_particles, self._mlp_output_dim + self._n_particles_features + 1
 
     def get_config(self):
         """Configurations of the NN besides the default ones"""
@@ -129,7 +145,8 @@ class EdgeConvLayer(keras.layers.Layer):
             "mlp_output_dim": self._mlp_output_dim,
             "final_index_coord": self._final_index_coord,
             "max_number_particles": self._max_number_particles,
-            "k_neighbors": self._k_neighbors
+            "k_neighbors": self._k_neighbors,
+            "n_particles_features": self._n_particles_features
         }
         return {**base_config, **config}
 

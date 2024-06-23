@@ -13,10 +13,9 @@ def load_json(json_file_path):
 if __name__ == "__main__":
     # loading models
     model_files = {
-        "imagem": "../CNN/Testing Algorithms/QG_Tag_Model_3.json",
-        "point_net": "../ParticleCloud/PointNet/QuarkGluon_Tagging_PointNet.json",
-        "particle_cloud": "../ParticleCloud/ParticleNet/QuarkGluon_Tagging_ParticleCloud.json",
-        # "combined": "../ModelFiles/CombinedModel.json"
+        "imagem": "../CNN/Top tagger/top-tagger-final.json",
+        # "point_net": "../ParticleCloud/PointNet/Top_Tagging_PointNet.json",
+        # "particle_cloud": "../ParticleCloud/ParticleNet/Top_Tagging_ParticleCloud.json",
     }
     # metrics for each of the models
     all_metrics = {model: load_json(model_file) for model, model_file in model_files.items()}
@@ -36,8 +35,6 @@ if __name__ == "__main__":
         "val_point_net": "darkgray",
         "particle_cloud": "#A34343",
         "val_particle_cloud": "#A34343",
-        # "combined": "darkgray",
-        # "val_combined": "darkgray"
     }
 
     labels_dict = {
@@ -55,8 +52,8 @@ if __name__ == "__main__":
         metrics=dict_metrics,
         labels=labels_dict,
         colors=color_dict,
-        xlim=(0, 100),
+        xlim=(0, 50),
         metric_name="Accuracy",
-        title="Quark-Gluon Tagger",
-        file_path="../../Plots/PerEpoch/Acc_QG_Tagger.pdf"
+        title="Top Tagger",
+        file_path="../../Plots/PerEpoch/Acc_Top_Tagger_Imagem.png"
     )

@@ -67,7 +67,6 @@ def load_data_qg_tagging_wR(quark_data_path: str, gluon_data_path: str,
     return X, y
 
 
-
 def load_data_top_tagging_wR(quark_data_path: str, gluon_data_path: str, top_data_path: str, 
                              mean_deltaRij_quark_path: str, mean_deltaRij_gluon_path: str, 
                              mean_deltaRij_top_path: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -105,8 +104,7 @@ def load_data_top_tagging_wR(quark_data_path: str, gluon_data_path: str, top_dat
     # Combine top jets with non-top jets
     all_efps = np.vstack((top_efps, non_top_efps))
     all_mean_deltaRij = np.concatenate((mean_deltaRij_top, mean_deltaRij_non_top))
-    
-    
+
     # Concatenating the mean DeltaRij values to the EFP features
     all_efps = np.hstack((all_efps, all_mean_deltaRij.reshape(-1, 1)))
 
