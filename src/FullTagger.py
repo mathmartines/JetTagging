@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class TaggerInterface(ABC):
+class Tagger(ABC):
     """Defines the interface for a generic tagger."""
     @abstractmethod
     def predict_proba(self, input_data):
@@ -21,7 +21,7 @@ class TaggerInterface(ABC):
         raise NotImplementedError("predict_proba is not implemented")
 
 
-class BinaryTagger(TaggerInterface, ABC):
+class BinaryTagger(Tagger, ABC):
     """A binary classifier must hold only one tagger."""
     def __init__(self, classifier):
         # binary tagger to use
@@ -44,7 +44,7 @@ class KerasBinaryTaggerSoftMax(BinaryTagger):
         return self._classifier.predict(input_data)
 
 
-class FullTagger(TaggerInterface):
+class FullTagger(Tagger):
     """
     Implements the tagger interface for a multi-class classifier.
     in our case, one classifier has to be a top-tagger, while the other has to be a quark-gluon tagger
