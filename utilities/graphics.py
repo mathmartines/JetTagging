@@ -33,7 +33,7 @@ def plot_roc_curve(
     legend.get_frame().set_edgecolor('none')
     plt.minorticks_on()
     if file_path is not None:
-        plt.savefig(file_path, format="png", bbox_inches="tight", dpi=300)
+        plt.savefig(file_path, format="pdf", bbox_inches="tight", dpi=300)
     plt.show()
 
 
@@ -57,4 +57,32 @@ def plot_metric_per_epoch(metrics: Dict[str, np.ndarray], labels: Dict[str, str]
     plt.title(title)
     if file_path is not None:
         plt.savefig(file_path, format="png", bbox_inches="tight", dpi=300)
+    plt.show()
+
+
+def plot_distributions(
+        bin_egdes, values_hist, colors, labels, title, x_label, y_label, file_path=None):
+    """Plot the histogram for different distributions."""
+    values = np.array([
+        np.mean([lower_edge, upper_edge]) for lower_edge, upper_edge in zip(bin_egdes[:-1], bin_egdes[1:])
+    ])
+    legend_list = []
+    for dist_name, counts in values_hist.items():
+        weights, _ = np.histogram(counts, bins=bin_egdes)
+        print(weights)
+        plt.hist(x=values, bins=bin_egdes, weights=weights, color=colors[dist_name], label=labels[dist_name],
+                 histtype="step")
+        legend_list.append(
+            Line2D([0], [0], color=colors[dist_name], lw=2, label=labels[dist_name],
+                   linestyle="solid")
+        )
+    plt.tick_params(axis="both", which="minor", top=True, right=True, length=2, direction="in")
+    plt.tick_params(axis="both", which="major", top=True, right=True, length=5, direction="in")
+    plt.minorticks_on()
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.legend(handles=legend_list, loc="best", frameon=False, framealpha=1, fontsize=15, fancybox=False, ncols=1)
+    if file_path is not None:
+        plt.savefig(file_path, format="pdf", bbox_inches="tight", dpi=300)
     plt.show()

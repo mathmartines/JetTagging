@@ -48,3 +48,33 @@ def load_data_top_tagging(top_quark_path: str, quark_data_path: str,
 
     # shuffling the data
     return shuffle(X, y, random_state=0)
+
+
+def load_data_full_tagger_tagging(top_quark_path: str, quark_data_path: str,
+                                  gluon_data_path: str) -> Tuple[np.ndarray, np.ndarray]:
+    """Loads the data for the full tagger."""
+    # loading the data files for the top, quark, and gluon jets
+    data_top = pd.read_csv(top_quark_path, header=None).to_numpy()
+    data_quark = pd.read_csv(quark_data_path, header=None).to_numpy()
+    data_gluon = pd.read_csv(gluon_data_path, header=None).to_numpy()
+    # selecting only half of quarks and gluons
+    all_jets = np.vstack([data_top, data_quark, data_gluon])
+
+    # preprocessing class
+    jet_preprocessing = JetProcessingParticleCloud()
+    X = jet_preprocessing.transform(all_jets)
+
+    # labels
+    y = create_jet_labels_one_column_per_category(
+        [
+            # top quarks
+            (0, data_top.shape[0] - 1),
+            # quark kets
+            (data_top.shape[0], data_top.shape[0] + data_quark.shape[0] - 1),
+            # gluon jets
+            (data_top.shape[0] + data_quark.shape[0], all_jets.shape[0] - 1)
+        ]
+    )
+
+    # shuffling the data
+    return shuffle(X, y, random_state=0)

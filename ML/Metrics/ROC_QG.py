@@ -168,5 +168,5 @@ if __name__ == "__main__":
         colors=colors,
         linestyle=linestyle,
         title="Quark-Gluon Tagger",
-        file_path="../../Plots/ROC_QG/ROC_PC.png"
+        # file_path="../../Plots/ROC_QG/ROC_PC.png"
     )
