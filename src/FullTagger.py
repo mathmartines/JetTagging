@@ -50,7 +50,7 @@ class FullTagger(Tagger):
     in our case, one classifier has to be a top-tagger, while the other has to be a quark-gluon tagger
     """
 
-    def __init__(self, top_tagger: BinaryTagger, quark_gluon_tagger: BinaryTagger):
+    def __init__(self, top_tagger: Tagger, quark_gluon_tagger: Tagger):
         self._top_tagger = top_tagger
         self._quark_gluon_tagger = quark_gluon_tagger
 
